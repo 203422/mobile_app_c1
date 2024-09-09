@@ -19,9 +19,9 @@ class MyApp extends StatelessWidget {
 
 class ContactListScreen extends StatelessWidget {
   final List<Contact> contacts = [
-    Contact(name: 'Fernando Pérez', phone: 'number phone', email: '213524@ids.upchiapas.edu.mx', matricula: '213524'),
-    Contact(name: 'Alan Gomez', phone: 'number phone', email: '203422@ids.upchiapas.edu.mx', matricula: '203422'),
-    Contact(name: 'Omar Ceja', phone: 'number phone', email: '203460@ids.upchiapas.edu.mx', matricula: '203460'), 
+    Contact(name: 'Fernando Pérez', phone: '9612739154', email: '213524@ids.upchiapas.edu.mx', matricula: '213524'),
+    Contact(name: 'Alan Gomez', phone: '9671632128', email: '203422@ids.upchiapas.edu.mx', matricula: '203422'),
+    Contact(name: 'Omar Ceja', phone: '9941064858', email: '203460@ids.upchiapas.edu.mx', matricula: '203460'),
   ];
 
   ContactListScreen({super.key});
@@ -29,7 +29,12 @@ class ContactListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Integrantes')),
+      backgroundColor:const Color.fromARGB(255, 10, 10, 10),
+      appBar: AppBar(
+          title: const Text('Integrantes', 
+          style: TextStyle(color: Colors.white)), 
+          backgroundColor: const Color.fromARGB(255, 10, 10, 10)
+          ),
       body: Center(
         child: Wrap(
           alignment: WrapAlignment.center,
@@ -48,11 +53,16 @@ class ContactListScreen extends StatelessWidget {
               child: Column(
                 children: [
                   CircleAvatar(
+                    backgroundColor: const Color.fromARGB(255, 121, 111, 129),
                     radius: 50, // Tamaño de las bolitas
-                    child: Text(contact.name[0], style: const TextStyle(fontSize: 24)),
+                    child: 
+                    Text(contact.name[0], 
+                    style: const TextStyle(fontSize: 24),
+                    
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  Text(contact.name),
+                  Text(contact.name, style: const TextStyle(fontSize: 16, color: Colors.white)),
                 ],
               ),
             );
@@ -69,46 +79,94 @@ class ContactDetailScreen extends StatelessWidget {
 
   ContactDetailScreen({super.key, required this.contact});
 
-  Future<void> _callNumber(String number) async {
-    await FlutterPhoneDirectCaller.callNumber(number);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor:const Color.fromARGB(255, 10, 10, 10),
+      appBar: AppBar(
+          title: Text(contact.name, 
+          style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+          ),
+          backgroundColor: const Color.fromARGB(255, 10, 10, 10),
+        ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Avatar con el nombre del contacto
+            const CircleAvatar(
+              radius: 40,
+              backgroundColor: Color.fromARGB(255, 39, 126, 176),
+              child: Icon(Icons.person, size: 50, color: Colors.white),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              contact.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              
+
+            ),
+            const SizedBox(height: 20),
+            
+            // Botones de Llamar y Mensaje de texto
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildContactAction(Icons.call, 'Llamar', () {
+                  _callNumber(contact.phone);
+                }),
+                _buildContactAction(Icons.message, 'Mensaje de texto', () {
+                  _showSmsDialog(context, contact.phone);
+                }),
+              ],
+            ),
+            const SizedBox(height: 30),
+
+            // Información del contacto (solo muestra lo que esté disponible)
+            _buildContactInfo(Icons.phone, 'Teléfono', contact.phone),
+            _buildContactInfo(Icons.email, 'Email', contact.email),
+            _buildContactInfo(Icons.badge, 'Matrícula', contact.matricula),
+          ],
+        ),
+      ),
+    );
   }
 
-  Future<void> _sendSms(BuildContext context, String number) async {
-    // Mostrar el cuadro de diálogo para ingresar el mensaje
-    TextEditingController messageController = TextEditingController();
+  // Función para realizar una llamada
+  void _callNumber(String number) async {
+    bool? res = await FlutterPhoneDirectCaller.callNumber(number);
+    print('Llamando: $res');
+  }
+
+  // Función para mostrar el diálogo de entrada de mensaje
+  void _showSmsDialog(BuildContext context, String phoneNumber) {
+    final TextEditingController messageController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Enviar Mensaje'),
+          title: const Text("Enviar Mensaje"),
           content: TextField(
             controller: messageController,
-            decoration: const InputDecoration(
-              labelText: 'Escribe tu mensaje',
-              border: OutlineInputBorder(),
-            ),
+            decoration: const InputDecoration(hintText: "Escribe tu mensaje"),
           ),
-          actions: [
+          actions: <Widget>[
             TextButton(
+              child: const Text("Cancelar"),
               onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el diálogo sin enviar
+                Navigator.of(context).pop();
               },
-              child: const Text('Cancelar'),
             ),
-            ElevatedButton(
+            TextButton(
+              child: const Text("Enviar"),
               onPressed: () async {
                 String message = messageController.text;
                 if (message.isNotEmpty) {
-                  final permission = await Permission.sms.request();
-                  if (permission.isGranted) {
-                    directSms.sendSms(message: message, phone: number);
-                  }
-                  // ignore: use_build_context_synchronously
-                  Navigator.of(context).pop(); // Cerrar el diálogo al enviar
+                  _sendSms(phoneNumber, message);
                 }
+                Navigator.of(context).pop(); // Cierra el diálogo
               },
-              child: const Text('Enviar'),
             ),
           ],
         );
@@ -116,52 +174,19 @@ class ContactDetailScreen extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(contact.name)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Avatar con el nombre del contacto
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: Colors.purple,
-              child: Icon(Icons.person, size: 50, color: Colors.white),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              contact.name,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            
-            // Botones de Llamar, Mensaje de texto, y Video (similar a la imagen)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildContactAction(Icons.call, 'Llamar', () {
-                  // Acción de llamada
-                }),
-                _buildContactAction(Icons.message, 'Mensaje de texto', () {
-                  // Acción de mensaje
-                }),
-              ],
-            ),
-            const SizedBox(height: 30),
+  // Función para enviar un SMS
+  void _sendSms(String number, String message) async {
+    var status = await Permission.sms.status;
+    if (!status.isGranted) {
+      await Permission.sms.request();
+    }
 
-            // Información del contacto (solo muestra lo que esté disponible)
-            if (contact.phone != null)
-              _buildContactInfo(Icons.phone, 'Teléfono', contact.phone!),
-            if (contact.email != null)
-              _buildContactInfo(Icons.email, 'Email', contact.email!),
-            if (contact.matricula != null)
-              _buildContactInfo(Icons.badge, 'Matrícula', contact.matricula!),
-          ],
-        ),
-      ),
-    );
+    try {
+      directSms.sendSms(phone: number, message: message);
+      print("Mensaje enviado a $number: $message");
+    } catch (e) {
+      print("Error al enviar mensaje: $e");
+    }
   }
 
   // Widget para mostrar un ícono y la información
@@ -170,18 +195,18 @@ class ContactDetailScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey),
+          Icon(icon, color: const Color.fromARGB(255, 248, 248, 248)),
           const SizedBox(width: 16),
           Text(
             '$label: $value',
-            style: TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16),
           ),
         ],
       ),
     );
   }
 
-  // Widget para los botones de acción (llamar, mensaje, video)
+  // Widget para los botones de acción (llamar, mensaje)
   Widget _buildContactAction(IconData icon, String label, VoidCallback onTap) {
     return Column(
       children: [
@@ -189,32 +214,12 @@ class ContactDetailScreen extends StatelessWidget {
           icon: Icon(icon, size: 30),
           onPressed: onTap,
         ),
-        Text(label, style: TextStyle(fontSize: 12)),
-      ],
-    );
-  }
-
-  // Widget para mostrar apps conectadas (ejemplo con WhatsApp)
-  Widget _buildConnectedAppsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Apps conectadas',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Icon(Icons.messenger, color: Colors.green),
-            const SizedBox(width: 16),
-            const Text('WhatsApp', style: TextStyle(fontSize: 16)),
-          ],
-        ),
+        Text(label, style: const TextStyle(fontSize: 12)),
       ],
     );
   }
 }
+
 class Contact {
   final String name;
   final String phone;
