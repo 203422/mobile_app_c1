@@ -1,4 +1,4 @@
-# Mi Aplicación Flutter
+# Ejemplos de Peticiones HTTP
 
 Esta es una aplicación Flutter que muestra ejemplos de peticiones con http y Dio librería de Dart/Flutter ademas de que se muestra una lista de contactos con los integratantes del equipo que elaboraron el proyecto y permite ver detalles sobre cada contacto, incluyendo la capacidad de realizar llamadas telefónicas y enviar mensajes SMS.
 
