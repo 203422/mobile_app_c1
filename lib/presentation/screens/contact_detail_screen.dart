@@ -3,13 +3,15 @@ import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:direct_sms/direct_sms.dart';
 import 'package:http_app/domain/models/contact.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactDetailScreen extends StatelessWidget {
   final Contact contact;
   final Color avatarColor;
   final DirectSms directSms = DirectSms();
 
-  ContactDetailScreen({super.key, required this.contact, required this.avatarColor});
+  ContactDetailScreen(
+      {super.key, required this.contact, required this.avatarColor});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class ContactDetailScreen extends StatelessWidget {
             CircleAvatar(
               radius: 50,
               backgroundColor: avatarColor,
-              child: contact.name == 'Alan Gomez'  
+              child: contact.name == 'Alan Gomez'
                   ? const CircleAvatar(
                       radius: 50,
                       backgroundImage: AssetImage('assets/images/pokemon.jpg'),
@@ -45,6 +47,13 @@ class ContactDetailScreen extends StatelessWidget {
                 }),
                 _buildContactAction(Icons.message, 'Mensaje de texto', () {
                   _showSmsDialog(context, contact.phone);
+                }),
+                _buildContactAction(Icons.file_copy, 'Repositorio', () async {
+                  if (await canLaunchUrl(Uri.parse(contact.repositorio))) {
+                    await launchUrl(Uri.parse(contact.repositorio));
+                  } else {
+                    print('No se puede abrir la URL del repositorio');
+                  }
                 }),
               ],
             ),

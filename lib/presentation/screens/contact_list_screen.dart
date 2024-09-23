@@ -5,9 +5,9 @@ import '../widgets/contact_avatar.dart';
 
 class ContactListScreen extends StatelessWidget {
   final List<Contact> contacts = const [
-    Contact(name: 'Fernando Pérez', phone: '9612739154', email: '213524@ids.upchiapas.edu.mx', matricula: '213524'),
-    Contact(name: 'Alan Gomez', phone: '9671632128', email: '203422@ids.upchiapas.edu.mx', matricula: '203422'),
-    Contact(name: 'Omar Ceja', phone: '9941064858', email: '203460@ids.upchiapas.edu.mx', matricula: '203460'),
+    Contact(name: 'Fernando Pérez', phone: '9612739154', email: '213524@ids.upchiapas.edu.mx', matricula: '213524', repositorio: 'https://github.com/FerchoXD'),
+    Contact(name: 'Alan Gomez', phone: '9671632128', email: '203422@ids.upchiapas.edu.mx', matricula: '203422', repositorio: 'https://github.com/203422'),
+    Contact(name: 'Omar Ceja', phone: '9941064858', email: '203460@ids.upchiapas.edu.mx', matricula: '203460', repositorio: 'https://github.com/203460'),
   ];
 
   final List<Color> avatarColors = [
@@ -32,7 +32,6 @@ class ContactListScreen extends StatelessWidget {
           children: contacts.asMap().entries.map((entry) {
             int index = entry.key;
             Contact contact = entry.value;
-
             return GestureDetector(
               onTap: () {
                 Navigator.push(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http_app/presentation/screens/contact_list_screen.dart';
+import 'package:http_app/presentation/screens/email_screen.dart';
 import 'presentation/screens/dio_screen.dart';
 import 'presentation/screens/http_screen.dart';
 
@@ -39,9 +40,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final List<Widget> _screens = [
-    const DioScreen(),
-    const HttpScreen(),
     ContactListScreen(),
+    const HttpScreen(),
+    EmailChecker()
   ];
 
   void _onTabTapped(int index) {
@@ -65,16 +66,16 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: _onTabTapped,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.http),
-            label: 'Dio',
+            icon: Icon(Icons.contacts),
+            label: 'Contacts',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.cloud),
             label: 'HTTP',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.contacts),
-            label: 'Contacts',
+            icon: Icon(Icons.email),
+            label: 'Email',
           ),
         ],
       ),
